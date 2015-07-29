@@ -13,16 +13,16 @@ import {
 } from './transitions'
 
 import type {
-  Url,
+  Location,
   MiddlewareHandler
 } from '../lib/types'
 
 import type {Router} from '../lib/createRouter'
 import type {RouterEngine} from '../lib/createFakeRouterEngine'
 
-function redirectMiddleware(next: MiddlewareHandler<Url>): MiddlewareHandler<Url> {
-  return function redirectHandler(url: Url): Promise<Url> {
-    return next(url === '/qwerty' ? '/' : url)
+function redirectMiddleware(next: MiddlewareHandler<Location>): MiddlewareHandler<Location> {
+  return function redirectHandler(location: Location): Promise<Location> {
+    return next(location === '/qwerty' ? '/' : location)
   }
 }
 
@@ -44,28 +44,28 @@ function main(): Promise<any> {
   )
 
   // Page: null
-  // Url: /
+  // Location: /
   router.subscribe(page => console.log('Page:', page))
-  engine.subscribe(url => console.log('Url:', url))
+  engine.subscribe(location => console.log('Location:', location))
 
   // Page: { page: 'IndexPage', props: { title: 'Welcome' } }
-  // Url: /
+  // Location: /
   return engine.run()
 
     // Page: { page: 'IndexPage', props: { title: 'Welcome' } }
-    // Url: /
+    // Location: /
     .then(() => engine.navigateTo('/qwerty'))
 
     // Page: { page: 'AboutPage', props: { title: 'About' } }
-    // Url: /company/about
+    // Location: /company/about
     .then(() => engine.navigateTo('/company/about'))
 
-    // Page: { page: 'NotFoundPage', props: { url: '/404' } }
-    // Url: /404
+    // Page: { page: 'NotFoundPage', props: { location: '/404' } }
+    // Location: /404
     .then(() => engine.navigateTo('/404'))
 
     // Page: { page: 'ErrorPage', props: { error: [Error: Fail] } }
-    // Url: /fail
+    // Location: /fail
     .then(() => engine.navigateTo('/fail'))
 }
 

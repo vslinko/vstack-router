@@ -5,7 +5,7 @@ import createTransition from '../lib/createTransition'
 
 import type {
   Screen,
-  Url,
+  Location,
   QueryParameters,
   Transition
 } from '../lib/types'
@@ -21,8 +21,8 @@ export var aboutTransition: Transition = createTransition('/about', function(que
     .then(props => ({page: 'AboutPage', props}))
 })
 
-export function notFoundTransition(url: Url): Promise<?Screen> {
-  return Promise.resolve({page: 'NotFoundPage', props: {url}})
+export function notFoundTransition(location: Location): Promise<?Screen> {
+  return Promise.resolve({page: 'NotFoundPage', props: {location}})
 }
 
 export var failTransition: Transition = createTransition('/fail', function(queryParameters: QueryParameters): Promise<Screen> {
@@ -30,8 +30,8 @@ export var failTransition: Transition = createTransition('/fail', function(query
 })
 
 export function createErrorTransition(transition: Transition): Transition {
-  return function errorTransition(url: Url): Promise<?Screen> {
-    return transition(url)
+  return function errorTransition(location: Location): Promise<?Screen> {
+    return transition(location)
       .catch(error => ({page: 'ErrorPage', props: {error}}))
   }
 }
