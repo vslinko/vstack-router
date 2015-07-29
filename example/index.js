@@ -15,13 +15,12 @@ import {
 } from './transitions'
 
 import type {
+  Router,
+  RouterEngine,
   History,
   Location,
   MiddlewareHandler
 } from '../lib/types'
-
-import type {Router} from '../lib/createRouter'
-import type {RouterEngine} from '../lib/createRouterEngine'
 
 function redirectMiddleware(next: MiddlewareHandler<Location>): MiddlewareHandler<Location> {
   return function redirectHandler(location: Location): Promise<Location> {
