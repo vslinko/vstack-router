@@ -34,7 +34,8 @@
     "match-route-pattern": "^1.3.0"
   },
   "devDependencies": {
-    "babel": "^5.8.19"
+    "babel": "^5.8.19",
+    "redux": "^1.0.0-rc"
   },
   "peerDependencies": {},
   "bundledDependencies": [],

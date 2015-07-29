@@ -2,10 +2,19 @@
 
 import {createMemoryHistory, createLocation} from 'history'
 
+import {createStore, combineReducers, applyMiddleware} from 'redux'
+
 import createRouter from '../lib/createRouter'
-import createRouterEngine from '../lib/createRouterEngine'
 import combineTransitions from '../lib/util/combineTransitions'
 import prefixTransition from '../lib/util/prefixTransition'
+
+import {
+  historyMiddleware,
+  routerReducer,
+  pushState,
+  createRouterListener
+} from '../lib/redux'
+
 import {
   indexTransition,
   aboutTransition,
@@ -16,24 +25,32 @@ import {
 
 import type {
   Router,
-  RouterEngine,
-  History,
-  Location,
-  MiddlewareHandler
+  History
 } from '../lib/types'
 
-function redirectMiddleware(next: MiddlewareHandler<Location>): MiddlewareHandler<Location> {
-  return function redirectHandler(location: Location): Promise<Location> {
-    return next(
-      location.pathname === '/qwerty'
-        ? createLocation('/')
-        : location
-    )
+function redirectMiddleware(store) {
+  return next => action => {
+    if (action.type === 'PUSH_STATE' && action.url === '/qwerty') {
+      return next({
+        ...action,
+        state: {},
+        url: '/'
+      })
+    }
+
+    return next(action)
   }
 }
 
 function main(): Promise<any> {
+  // history
+
+  var history: History = createMemoryHistory()
+
+  // router
+
   var router: Router = createRouter(
+    history,
     createErrorTransition(
       combineTransitions(
         indexTransition,
@@ -44,52 +61,42 @@ function main(): Promise<any> {
     )
   )
 
-  var history: History = createMemoryHistory()
+  // store
 
-  var engine: RouterEngine = createRouterEngine(
-    router,
-    history,
-    [redirectMiddleware]
-  )
+  var createStoreWithMiddleware = applyMiddleware(
+    redirectMiddleware,
+    historyMiddleware(history)
+  )(createStore)
 
-  // Location: /
-  router.listen(page => console.log('Page:', page))
-  history.listen(location => console.log('Location:', location.pathname))
+  var store = createStoreWithMiddleware(combineReducers({
+    router: routerReducer
+  }))
 
-  engine.run()
+  router.listen(createRouterListener(store))
 
-  // Page: { page: 'IndexPage', props: { title: 'Welcome' } }
-  return engine.waitQueue()
+  store.subscribe(() => {
+    console.log('Location:', store.getState().router.location.pathname)
+    console.log('Screen:', store.getState().router.screen)
+  })
+
+  // test
+
+  return router.waitQueue()
     .then(() => {
-      // Location: /qwerty
-      history.pushState({}, '/qwerty')
-      // Page: { page: 'IndexPage', props: { title: 'Welcome' } }
-      return engine.waitQueue()
+      store.dispatch(pushState({}, '/qwerty'))
+      return router.waitQueue()
     })
     .then(() => {
-      // Location: /company/about?title=Test
-      history.pushState({}, '/company/about?title=Test')
-      // Page: { page: 'AboutPage', props: { title: 'Test' } }
-      return engine.waitQueue()
+      store.dispatch(pushState({}, '/company/about?title=Test'))
+      return router.waitQueue()
     })
     .then(() => {
-      // Location: /404
-      history.pushState({}, '/404')
-      // Page: { page: 'NotFoundPage',
-      //   props:
-      //    { location:
-      //       { pathname: '/404',
-      //         search: '',
-      //         state: {},
-      //         action: 'PUSH',
-      //         key: 'w6djrl' } } }
-      return engine.waitQueue()
+      store.dispatch(pushState({}, '/404'))
+      return router.waitQueue()
     })
     .then(() => {
-      // Location: /fail
-      history.pushState({}, '/fail')
-      // Page: { page: 'ErrorPage', props: { error: [Error: Fail] } }
-      return engine.waitQueue()
+      store.dispatch(pushState({}, '/fail'))
+      return router.waitQueue()
     })
 }
 
