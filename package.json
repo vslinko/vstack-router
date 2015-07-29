@@ -25,7 +25,7 @@
     "url": "vslinko/vstack-router"
   },
   "scripts": {
-    "prepublish": "babel -d dist lib",
+    "prepublish": "rm -rf dist && babel -d dist lib",
     "example-console": "babel-node examples/console",
     "example-huge-app": "babel-node examples/huge-app/server"
   },
