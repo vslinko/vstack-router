@@ -3,9 +3,9 @@
 import {createMemoryHistory, createLocation} from 'history'
 
 import createRouter from '../lib/createRouter'
-import combineTransitions from '../lib/combineTransitions'
-import prefixTransition from '../lib/prefixTransition'
 import createRouterEngine from '../lib/createRouterEngine'
+import combineTransitions from '../lib/util/combineTransitions'
+import prefixTransition from '../lib/util/prefixTransition'
 import {
   indexTransition,
   aboutTransition,

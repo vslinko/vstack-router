@@ -1,7 +1,7 @@
 /* @flow */
 
 import * as api from './api'
-import createTransition from '../lib/createTransition'
+import createTransition from '../lib/util/createTransition'
 
 import type {
   Screen,
