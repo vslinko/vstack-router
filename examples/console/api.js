@@ -2,7 +2,7 @@
 
 import type {
   QueryParameters
-} from '../lib/types'
+} from '../../lib/types'
 
 export function fetchIndexData(): Promise<Object> {
   return new Promise(resolve => {

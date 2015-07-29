@@ -1,14 +1,14 @@
 /* @flow */
 
 import * as api from './api'
-import createTransition from '../lib/util/createTransition'
+import createTransition from '../../lib/util/createTransition'
 
 import type {
   Screen,
   Location,
   QueryParameters,
   Transition
-} from '../lib/types'
+} from '../../lib/types'
 
 export var indexTransition: Transition = createTransition('/', function(queryParameters: QueryParameters): Promise<Screen> {
   return api.fetchIndexData()

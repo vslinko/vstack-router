@@ -4,16 +4,16 @@ import {createMemoryHistory, createLocation} from 'history'
 
 import {createStore, combineReducers, applyMiddleware} from 'redux'
 
-import createRouter from '../lib/createRouter'
-import combineTransitions from '../lib/util/combineTransitions'
-import prefixTransition from '../lib/util/prefixTransition'
+import createRouter from '../../lib/createRouter'
+import combineTransitions from '../../lib/util/combineTransitions'
+import prefixTransition from '../../lib/util/prefixTransition'
 
 import {
   historyMiddleware,
   routerReducer,
   pushState,
   createRouterListener
-} from '../lib/redux'
+} from '../../lib/redux'
 
 import {
   indexTransition,
@@ -26,7 +26,7 @@ import {
 import type {
   Router,
   History
-} from '../lib/types'
+} from '../../lib/types'
 
 function redirectMiddleware(store) {
   return next => action => {
