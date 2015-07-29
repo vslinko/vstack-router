@@ -45,8 +45,8 @@ function main(): Promise<any> {
 
   // Page: null
   // Location: /
-  router.subscribe(page => console.log('Page:', page))
-  engine.subscribe(location => console.log('Location:', location))
+  router.listen(page => console.log('Page:', page))
+  engine.listen(location => console.log('Location:', location))
 
   // Page: { page: 'IndexPage', props: { title: 'Welcome' } }
   // Location: /
