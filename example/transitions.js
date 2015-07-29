@@ -17,7 +17,7 @@ export var indexTransition: Transition = createTransition('/', function(queryPar
 
 
 export var aboutTransition: Transition = createTransition('/about', function(queryParameters: QueryParameters): Promise<Screen> {
-  return api.fetchAboutData()
+  return api.fetchAboutData(queryParameters)
     .then(props => ({page: 'AboutPage', props}))
 })
 

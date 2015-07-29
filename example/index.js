@@ -1,9 +1,11 @@
 /* @flow */
 
+import {createMemoryHistory, createLocation} from 'history'
+
 import createRouter from '../lib/createRouter'
 import combineTransitions from '../lib/combineTransitions'
 import prefixTransition from '../lib/prefixTransition'
-import createFakeRouterEngine from '../lib/createFakeRouterEngine'
+import createRouterEngine from '../lib/createRouterEngine'
 import {
   indexTransition,
   aboutTransition,
@@ -13,16 +15,21 @@ import {
 } from './transitions'
 
 import type {
+  History,
   Location,
   MiddlewareHandler
 } from '../lib/types'
 
 import type {Router} from '../lib/createRouter'
-import type {RouterEngine} from '../lib/createFakeRouterEngine'
+import type {RouterEngine} from '../lib/createRouterEngine'
 
 function redirectMiddleware(next: MiddlewareHandler<Location>): MiddlewareHandler<Location> {
   return function redirectHandler(location: Location): Promise<Location> {
-    return next(location === '/qwerty' ? '/' : location)
+    return next(
+      location.pathname === '/qwerty'
+        ? createLocation('/')
+        : location
+    )
   }
 }
 
@@ -38,35 +45,53 @@ function main(): Promise<any> {
     )
   )
 
-  var engine: RouterEngine = createFakeRouterEngine(
+  var history: History = createMemoryHistory()
+
+  var engine: RouterEngine = createRouterEngine(
     router,
+    history,
     [redirectMiddleware]
   )
 
-  // Page: null
   // Location: /
   router.listen(page => console.log('Page:', page))
-  engine.listen(location => console.log('Location:', location))
+  history.listen(location => console.log('Location:', location.pathname))
+
+  engine.run()
 
   // Page: { page: 'IndexPage', props: { title: 'Welcome' } }
-  // Location: /
-  return engine.run()
-
-    // Page: { page: 'IndexPage', props: { title: 'Welcome' } }
-    // Location: /
-    .then(() => engine.navigateTo('/qwerty'))
-
-    // Page: { page: 'AboutPage', props: { title: 'About' } }
-    // Location: /company/about
-    .then(() => engine.navigateTo('/company/about'))
-
-    // Page: { page: 'NotFoundPage', props: { location: '/404' } }
-    // Location: /404
-    .then(() => engine.navigateTo('/404'))
-
-    // Page: { page: 'ErrorPage', props: { error: [Error: Fail] } }
-    // Location: /fail
-    .then(() => engine.navigateTo('/fail'))
+  return engine.waitQueue()
+    .then(() => {
+      // Location: /qwerty
+      history.pushState({}, '/qwerty')
+      // Page: { page: 'IndexPage', props: { title: 'Welcome' } }
+      return engine.waitQueue()
+    })
+    .then(() => {
+      // Location: /company/about?title=Test
+      history.pushState({}, '/company/about?title=Test')
+      // Page: { page: 'AboutPage', props: { title: 'Test' } }
+      return engine.waitQueue()
+    })
+    .then(() => {
+      // Location: /404
+      history.pushState({}, '/404')
+      // Page: { page: 'NotFoundPage',
+      //   props:
+      //    { location:
+      //       { pathname: '/404',
+      //         search: '',
+      //         state: {},
+      //         action: 'PUSH',
+      //         key: 'w6djrl' } } }
+      return engine.waitQueue()
+    })
+    .then(() => {
+      // Location: /fail
+      history.pushState({}, '/fail')
+      // Page: { page: 'ErrorPage', props: { error: [Error: Fail] } }
+      return engine.waitQueue()
+    })
 }
 
 main()
