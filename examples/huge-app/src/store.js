@@ -1,5 +1,9 @@
 import {createStore, combineReducers, applyMiddleware} from 'redux'
-import {historyMiddleware, routerReducer, createRouterListener} from '../../../lib/redux'
+import {
+  historyMiddleware,
+  routerReducer,
+  createRouterListener
+} from 'redux-vstack-router'
 
 import history from './history'
 import router from './router'

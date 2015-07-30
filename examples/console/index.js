@@ -13,7 +13,7 @@ import {
   routerReducer,
   pushState,
   createRouterListener
-} from '../../lib/redux'
+} from 'redux-vstack-router'
 
 import {
   indexTransition,
