@@ -1,6 +1,6 @@
 {
   "name": "vstack-router",
-  "version": "0.5.0",
+  "version": "0.5.2",
   "description": "Universal router",
   "keywords": [
     "vstack",
@@ -18,22 +18,30 @@
     "url": "https://twitter.com/vslinko"
   },
   "contributors": [],
-  "main": "lib/index.js",
+  "main": "cjs/index.js",
+  "module": "esm/index.ts",
   "scripts": {
-    "prepublish": "rm -rf lib && babel src -x .ts --out-dir lib"
+    "prepublish": "rm -rf cjs esm && babel src -x .ts --out-dir cjs --plugins @babel/plugin-transform-modules-commonjs && babel src -x .ts --out-dir esm"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
     "@babel/core": "^7.9.6",
     "@babel/plugin-transform-modules-commonjs": "^7.9.6",
-    "@babel/preset-typescript": "^7.9.0"
+    "@babel/preset-typescript": "^7.9.0",
+    "babel-plugin-transform-rename-import": "^2.3.0"
   },
   "babel": {
     "presets": [
       "@babel/preset-typescript"
     ],
     "plugins": [
-      "@babel/plugin-transform-modules-commonjs"
+      [
+        "babel-plugin-transform-rename-import",
+        {
+          "original": "^(.+?)\\.ts$",
+          "replacement": "$1.js"
+        }
+      ]
     ]
   }
 }
